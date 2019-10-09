@@ -1,16 +1,18 @@
-make-deb: Helper Tool for getting your python code into debian packages
+Project forked from: `https://github.com/nylas/make-deb`
+
+python-make-deb: Helper Tool for getting your python code into debian packages
 =============================================
 
-Make-deb is a simple tool that generates Debian configuration based on your setuptools configuration and git history. When run, it will create a Debian directory at the root of your python project with the necessary files to build your package into a Debian package using `dh-virtualenv <https://github.com/spotify/dh-virtualenv>`_
+Python-make-deb is a simple tool that generates Debian configuration based on your setuptools configuration and git history. When run, it will create a Debian directory at the root of your python project with the necessary files to build your package into a Debian package using `dh-virtualenv <https://github.com/spotify/dh-virtualenv>`_
 
 .. code-block:: bash
 
    $ cd /my/python/repository
-   $ make-deb
+   $ python-make-deb
 
    'debian' directory successfully placed at the root of your repository
 
-If setuptools does not have complete information, make-deb will ask for additional information (for example, maintainer email). After initialization, a directory named "debian" will be reated at the root of your repo. Assuming you have dh-virtualenv installed, you should be able to simply create a .deb from your python project by running the following command at the root of your project.
+If setuptools does not have complete information, python-make-deb will ask for additional information (for example, maintainer email). After initialization, a directory named "debian" will be reated at the root of your repo. Assuming you have dh-virtualenv installed, you should be able to simply create a .deb from your python project by running the following command at the root of your project.
 
 .. code-block:: bash
 
@@ -19,11 +21,11 @@ If setuptools does not have complete information, make-deb will ask for addition
 Installation
 ------------
 
-To install make-deb:
+To install python-make-deb:
 
 .. code-block:: bash
 
-   $ pip install make-deb
+   $ pip install python-make-deb
 
 Documentation
 -------------

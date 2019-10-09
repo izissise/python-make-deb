@@ -93,7 +93,7 @@ class DebianConfiguration(object):
         for template in self.DEBIAN_CONFIGURATION_TEMPLATES:
             filename = os.path.basename(template).replace(".j2", "")
             content = Template(
-                resource_string("make_deb", template).decode('utf-8')
+                resource_string("python_make_deb", template).decode('utf-8')
             ).render(self.context)
 
             with open(os.path.join(output_dir, filename), "w") as f:
@@ -101,7 +101,8 @@ class DebianConfiguration(object):
 
         # Need to to trigger separately because filename must change
         trigger_content = Template(
-            resource_string("make_deb", "resources/debian/triggers.j2").
+            resource_string("python_make_deb",
+                            "resources/debian/triggers.j2").
             decode('utf-8')
         ).render(self.context)
 
