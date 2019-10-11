@@ -19,10 +19,14 @@ setup(
             "resources/debian/compat.j2"
             ]
         },
-    scripts=['bin/python-make-deb'],
     install_requires=[
         'future',
         'Jinja2'
     ],
-    zip_safe=False
+    zip_safe=False,
+    entry_points={
+        'console_scripts': [
+            'python-make-deb = python_make_deb:main',
+        ]
+    },
 )

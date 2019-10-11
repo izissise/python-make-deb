@@ -1,5 +1,6 @@
 import datetime
 import os
+import sys
 from pkg_resources import resource_string
 import shutil
 import subprocess
@@ -37,7 +38,25 @@ class DebianConfiguration(object):
         self.context = self.DEFAULT_CONTEXT.copy()
         self.context.update({"date": datetime.datetime.now()})
         self.context.update(self._context_from_setuppy())
-        self.context.update(self._context_from_git())
+        if self.not_in_context('changelog'):
+            self.context.update(self._context_from_git())
+        self.context.update(self._context_from_cmdline_args())
+        self.context.update(self._context_from_context())
+
+    def not_in_context(self, key):
+        return (key not in self.context or
+                self.context[key] == UNKNOWN)
+
+    def _context_from_context(self):
+        update = {}
+        # Move author in maintainer if not defined
+        if self.not_in_context('maintainer') and 'author' in self.context:
+            update.update({'maintainer': self.context['author']})
+        if (self.not_in_context('maintainer_email')
+                and 'author_email' in self.context):
+            update.update(
+                {'maintainer_email': self.context['author_email']})
+        return update
 
     def _context_from_git(self):
         try:
@@ -45,7 +64,7 @@ class DebianConfiguration(object):
                 ["git", "log", "-1", "--oneline"],
                 cwd=self.rootdir,
                 stdout=subprocess.PIPE).communicate()
-            return {"latest_git_commit": stdout[0]}
+            return {"changelog": '  * ' + stdout[0].decode()}
         except OSError:
             raise DebianConfigurationException("Please install git")
         except Exception as e:
@@ -59,35 +78,33 @@ class DebianConfiguration(object):
         stdout = subprocess.Popen(
             ["python", os.path.join(self.rootdir, "setup.py"),
              "--name", "--version", "--maintainer", "--maintainer-email",
+             "--author", "--author-email",
              "--description"], stdout=subprocess.PIPE).communicate()
 
+        long_description_stdout = subprocess.Popen(
+            ["python", os.path.join(self.rootdir, "setup.py"),
+             "--long-description"], stdout=subprocess.PIPE).communicate()
+
         setup_values = stdout[0].decode('utf-8').split('\n')[:-1]
+        setup_values.append(long_description_stdout[0].decode('utf-8')[:-1])
         setup_names = ["name", "version", "maintainer", "maintainer_email",
-                       "description"]
+                       "author", "author_email", "description", "changelog"]
 
         context = {}
         for name, value in zip(setup_names, setup_values):
-            while not value or value == UNKNOWN:
-                value = input(
-                    "The '{}' parameter is not defined in setup.py. "
-                    "Please define it for debian configuration: ".format(name))
-                if not value:
-                    print("Invalid value. Please try again")
-
-            context[name] = value
-
+            if value or value != UNKNOWN:
+                context[name] = value
         return context
+
+    def _context_from_cmdline_args(self):
+        return {}
 
     def render(self):
         output_dir = os.path.join(self.rootdir, "debian")
 
         if os.path.exists(output_dir):
-            res = input("A debian directory exists. Replace it? [Y/n]: ")
-            if res.lower() in ["n", "no"]:
-                raise DebianConfigurationException(
-                    "Not removing debian directory")
+            print('Removing existing debian directory')
             shutil.rmtree(output_dir)
-
         os.mkdir(output_dir)
 
         for template in self.DEBIAN_CONFIGURATION_TEMPLATES:
@@ -109,3 +126,20 @@ class DebianConfiguration(object):
         trigger_filename = "%s.triggers" % self.context['name']
         with open(os.path.join(output_dir, trigger_filename), "w") as f:
             f.write(trigger_content+"\n")
+
+
+def main():
+    try:
+        debconf = DebianConfiguration(os.getcwd())
+        debconf.render()
+    except DebianConfigurationException as e:
+        print(e)
+        return 1
+
+    print("'debian' directory successfully placed at the "
+          "root of the repository")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
