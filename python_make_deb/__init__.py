@@ -1,15 +1,29 @@
 import datetime
 import os
 import sys
-from pkg_resources import resource_string
+import argparse
 import shutil
 import subprocess
+from pkg_resources import resource_string
 
 from builtins import input
 from jinja2 import Template
 
 # String setuptools uses to specify None
 UNKNOWN = "UNKNOWN"
+
+
+PYTHON2_CONFIG = {
+    'python_version': 'python',
+    'python_package': 'python2.7-minimal',
+    'python_bin': '/usr/bin/python2.7',
+}
+
+PYTHON3_CONFIG = {
+    'python_version': 'python3',
+    'python_package': 'python3.7-minimal',
+    'python_bin': '/usr/bin/python3',
+}
 
 
 class DebianConfigurationException(Exception):
@@ -97,7 +111,17 @@ class DebianConfiguration(object):
         return context
 
     def _context_from_cmdline_args(self):
-        return {}
+        ctx = {}
+        parser = argparse.ArgumentParser(description='')
+        parser.add_argument('--python2', action='store_true',
+                            help='Generate python2 venv (default python3)')
+        args = parser.parse_args()
+        python_conf = PYTHON3_CONFIG
+        if args.python2:
+            python_conf = PYTHON2_CONFIG
+        ctx.update(python_conf)
+        ctx.update({'shlibdeps': '-X/x86/ -X/psycopg2/.libs'})
+        return ctx
 
     def render(self):
         output_dir = os.path.join(self.rootdir, "debian")

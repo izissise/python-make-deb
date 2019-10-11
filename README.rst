@@ -31,3 +31,14 @@ Documentation
 -------------
 
 Generating your Debian configuration can be run from any operating system. However, in order to build a debian package, you must be on a Debian-based operating system and have dh-virtualenv installed. In the future, we plan to support Vagrant integration to build packages from any platform.
+
+Example run using docker:
+.. code-block:: bash
+    $ docker run --rm -ti -v $PWD:/app ubuntu:bionic
+    $ apt-get update && apt-get install -y python3-setuptools build-essential python3-pip dh-virtualenv debhelper libffi-dev
+    $ pip install python-make-deb
+    $ cp -r /app /app2
+    $ cd /app2
+    $ python-make-deb
+    $ dpkg-buildpackage -us -uc
+    $ cp /*.deb /app/
