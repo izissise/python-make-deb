@@ -115,12 +115,19 @@ class DebianConfiguration(object):
         parser = argparse.ArgumentParser(description='')
         parser.add_argument('--python2', action='store_true',
                             help='Generate python2 venv (default python3)')
+        parser.add_argument('--install-dir', type=str, default='/opt/venvs/',
+                            help='Where to install the venv '
+                                 'when installing package')
+        parser.add_argument('--shlibdeps', type=str,
+                            default='-X/x86/ -X/psycopg2/.libs',
+                            help='Where to search for lib dependencies')
         args = parser.parse_args()
         python_conf = PYTHON3_CONFIG
         if args.python2:
             python_conf = PYTHON2_CONFIG
         ctx.update(python_conf)
-        ctx.update({'shlibdeps': '-X/x86/ -X/psycopg2/.libs'})
+        ctx.update({'shlibdeps': args.shlibdeps,
+                    'dh_virtualenv_install_root': args.install_dir})
         return ctx
 
     def render(self):

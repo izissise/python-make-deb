@@ -16,7 +16,7 @@ If setuptools does not have complete information, python-make-deb will ask for a
 
 .. code-block:: bash
 
-   $ dpkg-buildpackage -us -uc
+   $ dpkg-buildpackage -us -uc -b
 
 Installation
 ------------
@@ -35,10 +35,10 @@ Generating your Debian configuration can be run from any operating system. Howev
 Example run using docker:
 .. code-block:: bash
     $ docker run --rm -ti -v $PWD:/app ubuntu:bionic
-    $ apt-get update && apt-get install -y python3-setuptools build-essential python3-pip dh-virtualenv debhelper libffi-dev
-    $ pip install python-make-deb
+    $ apt-get update && apt-get install -y python3-setuptools python-setuptools git build-essential python3-pip dh-virtualenv debhelper libffi-dev
+    $ pip3 install python-make-deb
     $ cp -r /app /app2
     $ cd /app2
     $ python-make-deb
-    $ dpkg-buildpackage -us -uc
+    $ dpkg-buildpackage -us -uc -b
     $ cp /*.deb /app/

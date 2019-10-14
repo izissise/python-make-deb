@@ -1,5 +1,7 @@
 #!/usr/bin/make -f
 
+export DH_VIRTUALENV_INSTALL_ROOT={{ dh_virtualenv_install_root }}
+
 .PHONY: override_dh_virtualenv override_dh_strip override_dh_shlibdeps
 
 %:
