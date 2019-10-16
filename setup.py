@@ -9,6 +9,7 @@ setup(
     author="Hugues Morisset",
     author_email="morisset.hugues@gmail.com",
     description="Generates Debian configuration based on your setup.py",
+    include_package_data=True,
     package_data={
         "python_make_deb": [
             "resources/debian/control.j2",
