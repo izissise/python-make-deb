@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(
     name='python-make-deb',
-    version='0.1.1',
+    version='0.1.2',
     packages=['python_make_deb'],
     author="Hugues Morisset",
     author_email="morisset.hugues@gmail.com",
